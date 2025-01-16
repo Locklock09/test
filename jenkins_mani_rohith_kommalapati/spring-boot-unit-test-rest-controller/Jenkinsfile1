@@ -1,0 +1,47 @@
+@Library('jenkins_rohith_library') _
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                script {
+                    mylibrary.checkoutCode('master', 'https://tools.publicis.sapient.com/bitbucket/scm/psnb/jenkins_mani_rohith_kommalapati.git', 'tests_jenkins')
+                }
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                script {
+                    mylibrary.buildApplication('spring-boot-unit-test-rest-controller', '-DskipTests')
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    mylibrary.runTests('spring-boot-unit-test-rest-controller')
+                }
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                script {
+                    mylibrary.archiveArtifactsStep('spring-boot-unit-test-rest-controller', 'target/*.jar')
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
